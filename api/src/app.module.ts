@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MongooseModule } from '@nestjs/mongoose';
+import { TransactionsModule } from './transactions/transactions.module';
+import { EventLogsModule } from './event-logs/event-logs.module';
 
 @Module({
   imports: [
@@ -33,6 +35,10 @@ import { MongooseModule } from '@nestjs/mongoose';
         uri: configService.get<string>('MONGO_URI'),
       }),
     }),
+
+    TransactionsModule,
+
+    EventLogsModule,
   ],
   controllers: [],
   providers: [],
