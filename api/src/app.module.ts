@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TransactionsModule } from './transactions/transactions.module';
 import { EventLogsModule } from './event-logs/event-logs.module';
+import { AwsModule } from './aws/aws.module';
 
 @Module({
   imports: [
@@ -39,6 +40,8 @@ import { EventLogsModule } from './event-logs/event-logs.module';
     TransactionsModule,
 
     EventLogsModule,
+
+    AwsModule,
   ],
   controllers: [],
   providers: [],
