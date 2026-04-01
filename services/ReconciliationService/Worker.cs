@@ -6,8 +6,9 @@ namespace ReconciliationService;
 public class Worker : BackgroundService
 {
     private readonly ILogger<Worker> _logger;
-    private readonly string _pgConn = "Host=localhost;Username=admin;Password=Strangerthings06;Database=ledger_db";
-    private readonly string _mongoConn = "mongodb://admin:Strangerthings06@localhost:27017";
+    private readonly string _pgConn = Environment.GetEnvironmentVariable("PG_CONN") ?? "Host=localhost;Username=admin;Password=Strangerthings06;Database=ledger_db";
+
+    private readonly string _mongoConn = Environment.GetEnvironmentVariable("MONGO_CONN") ?? "mongodb://admin:Strangerthings06@localhost:27017";
 
     public Worker(ILogger<Worker> logger) => _logger = logger;
 
