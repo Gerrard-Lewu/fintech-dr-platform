@@ -3,14 +3,21 @@ version: '3.8'
 services:
   # DATABASE: The Ledger
   postgres:
-    image: postgres:18-alpine
+    image: postgres:16-alpine
     container_name: fintech-postgres
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: Strangerthings06
       POSTGRES_DB: ledger_db
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d ledger_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     ports:
       - "5432:5432"
+    volumes:
+      - "./infra/local/postgres_data:/var/lib/postgresql/data"
 
   # DATABASE: The Audit Trail
   mongodb:
@@ -21,6 +28,8 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: Strangerthings06
     ports:
       - "27017:27017"
+    volumes:
+      - "./infra/local/mongodb_data:/data/db"
 
   # AWS EMULATOR: SQS and S3
   localstack:
@@ -32,6 +41,10 @@ services:
       - SERVICES=sqs,s3
       - DEBUG=1
       - LOCALSTACK_ACKNOWLEDGE_ACCOUNT_REQUIREMENT=1
+    volumes:
+      - "./infra/local/localstack:/etc/localstack/init/ready.d"
+      - "./infra/local/localstack_data:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
 
   # BACKEND: NestJS API Gateway
   api:
@@ -40,15 +53,14 @@ services:
     ports:
       - "3000:3000"
     depends_on:
-      - postgres
-      - mongodb
-      - localstack
-    environment:
-      # We use service names (postgres, mongodb) instead of 'localhost'
-      - POSTGRES_URI=postgresql://admin:Strangerthings06@postgres:5432/ledger_db
-      - MONGO_URI=mongodb://admin:Strangerthings06@mongodb:27017/admin
-      - SQS_ENDPOINT=http://localstack:4566
-      - AWS_REGION=us-east-1
+      postgres:
+        condition: service_healthy # CHANGE THIS from service_started
+      mongodb:
+        condition: service_started
+      localstack:
+        condition: service_started
+    env_file:
+      - .env
 
   # WORKER: .NET Reconciliation Engine
   auditor:
@@ -57,6 +69,5 @@ services:
     depends_on:
       - postgres
       - mongodb
-    environment:
-      - PG_CONN=Host=postgres;Username=admin;Password=Strangerthings06;Database=ledger_db
-      - MONGO_CONN=mongodb://admin:Strangerthings06@mongodb:27017
+    env_file:
+      - .env
