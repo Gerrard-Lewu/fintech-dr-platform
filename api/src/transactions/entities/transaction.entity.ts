@@ -5,6 +5,9 @@ export class Transaction {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Column({ type: 'varchar', unique: true }) // CRITICAL: This prevents the same ID twice
+  correlationId: string;
+
   @Column({ type: 'varchar', length: 100 })
   accountId: string;
 

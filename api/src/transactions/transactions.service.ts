@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
@@ -13,28 +13,36 @@ export class TransactionsService {
   constructor(
     @InjectRepository(Transaction)
     private transactionRepository: Repository<Transaction>,
-    private awsService: AwsService, // <-- Inject your AWS Service
+    private awsService: AwsService,
   ) {}
 
   async create(createTransactionDto: CreateTransactionDto) {
-    // 1. Save the structured data to PostgreSQL
-    const newTransaction = this.transactionRepository.create(createTransactionDto);
-    const savedTransaction = await this.transactionRepository.save(newTransaction);
-    this.logger.log(`Saved transaction ${savedTransaction.id} to Postgres`);
-
-    // 2. Fire an event to AWS SQS for the DR/Audit pipeline
     try {
+      // 1. Save to PostgreSQL
+      const newTransaction = this.transactionRepository.create(createTransactionDto);
+      
+      // We tell TS that savedTransaction is a single Transaction object
+      const savedTransaction = await this.transactionRepository.save(newTransaction);
+      
+      this.logger.log(`Saved transaction ${savedTransaction.id} to Postgres`);
+
+      // 2. Fire an event to AWS SQS
       await this.awsService.sendTransactionMessage({
         eventType: 'TRANSACTION_CREATED',
         source: 'CORE_API',
         data: savedTransaction,
         timestamp: new Date().toISOString(),
       });
-    } catch (error) {
-      this.logger.error(`Failed to send transaction ${savedTransaction.id} to SQS`, error.stack);
-    }
 
-    return savedTransaction;
+      return savedTransaction;
+    } catch (error) {
+      // Check for Postgres Unique Constraint Violation (Error 23505)
+      if (error.code === '23505') {
+        this.logger.warn(`Duplicate transaction blocked: ${createTransactionDto.correlationId}`);
+        throw new ConflictException('Transaction with this Correlation ID already processed');
+      }
+      throw error;
+    }
   }
 
   findAll() {
