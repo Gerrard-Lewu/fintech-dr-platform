@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs';
+import { SQSClient, SendMessageCommand, ReceiveMessageCommand, DeleteMessageCommand } from '@aws-sdk/client-sqs'
 
 @Injectable()
 export class AwsService {
@@ -37,6 +37,35 @@ export class AwsService {
     } catch (error) {
       this.logger.error(`[SQS] Failed to send message: ${error.message}`, error.stack);
       throw error;
+    }
+  }
+
+  // Pull messages from the queue
+  async receiveMessages() {
+    try {
+      const command = new ReceiveMessageCommand({
+        QueueUrl: this.queueUrl,
+        MaxNumberOfMessages: 10,
+        WaitTimeSeconds: 5, // This enables "Long Polling" to save CPU/Network
+      });
+      const response = await this.sqsClient.send(command);
+      return response.Messages || [];
+    } catch (error) {
+      this.logger.error(`[SQS] Failed to receive messages: ${error.message}`);
+      return [];
+    }
+  }
+
+  // Delete messages once they are successfully processed
+  async deleteMessage(receiptHandle: string) {
+    try {
+      const command = new DeleteMessageCommand({
+        QueueUrl: this.queueUrl,
+        ReceiptHandle: receiptHandle,
+      });
+      await this.sqsClient.send(command);
+    } catch (error) {
+      this.logger.error(`[SQS] Failed to delete message: ${error.message}`);
     }
   }
 }
