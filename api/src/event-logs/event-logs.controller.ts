@@ -19,16 +19,16 @@ export class EventLogsController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.eventLogsService.findOne(+id);
+    return this.eventLogsService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateEventLogDto: UpdateEventLogDto) {
-    return this.eventLogsService.update(+id, updateEventLogDto);
+    return this.eventLogsService.update(id, updateEventLogDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.eventLogsService.remove(+id);
+    return this.eventLogsService.remove(id);
   }
 }

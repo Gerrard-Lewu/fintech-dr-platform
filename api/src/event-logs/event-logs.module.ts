@@ -3,6 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { EventLogsService } from './event-logs.service';
 import { EventLogsController } from './event-logs.controller';
 import { EventLog, EventLogSchema } from './entities/event-log.entity';
+import { AwsModule } from '../aws/aws.module';
 
 @Module({
   // Import the Mongoose feature to recognize the EventLog schema
@@ -10,6 +11,7 @@ import { EventLog, EventLogSchema } from './entities/event-log.entity';
     MongooseModule.forFeature([
       { name: EventLog.name, schema: EventLogSchema },
     ]),
+    AwsModule,
   ],
   controllers: [EventLogsController],
   providers: [EventLogsService],
