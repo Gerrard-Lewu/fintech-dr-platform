@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: localstack-init-scripts
+data:
+  init-aws.sh: |
+    #!/bin/bash
+    echo "########### Creating SQS Queue ###########"
+    awslocal sqs create-queue --queue-name transaction-queue --region us-east-1
+    echo "########### AWS Initialization Complete ###########"

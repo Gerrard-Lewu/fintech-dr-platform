@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: localstack
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: localstack
+  template:
+    metadata:
+      labels:
+        app: localstack
+    spec:
+      containers:
+      - name: localstack
+        image: {{ .Values.images.localstack }}
+        ports:
+        - containerPort: 4566
+        env:
+        - name: SERVICES
+          value: "sqs"
+        volumeMounts:
+        - name: init-scripts
+          mountPath: /etc/localstack/init/ready.d
+      volumes:
+      - name: init-scripts
+        configMap:
+          name: localstack-init-scripts
+          defaultMode: 0755 # This gives the script execution permission
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: localstack
+spec:
+  selector:
+    app: localstack
+  ports:
+  - port: 4566
+    targetPort: 4566

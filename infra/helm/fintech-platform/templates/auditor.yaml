@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auditor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auditor
+  template:
+    metadata:
+      labels:
+        app: auditor
+    spec:
+      containers:
+      - name: auditor
+        image: {{ .Values.images.auditor }}
+        imagePullPolicy: Never # Uses the local image you built
+        env:
+        - name: PG_CONN
+          value: "Host=postgres;Username={{ .Values.database.user }};Password={{ .Values.database.pass }};Database={{ .Values.database.ledgerName }}"
+        - name: MONGO_CONN
+          value: "mongodb://{{ .Values.database.user }}:{{ .Values.database.pass }}@mongodb:27017"

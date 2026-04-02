@@ -14,20 +14,19 @@ spec:
     spec:
       containers:
       - name: postgres
-        image: postgres:16-alpine
+        image: {{ .Values.images.postgres }}
         ports:
         - containerPort: 5432
         env:
-         morerows...
         - name: POSTGRES_USER
-          value: "admin"
+          value: {{ .Values.database.user | quote }}
+        - name: POSTGRES_DB
+          value: {{ .Values.database.ledgerName | quote }}
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
               name: fintech-secrets
               key: postgres-password
-        - name: POSTGRES_DB
-          value: "ledger_db"
 ---
 apiVersion: v1
 kind: Service
@@ -38,3 +37,4 @@ spec:
     app: postgres
   ports:
   - port: 5432
+    targetPort: 5432
