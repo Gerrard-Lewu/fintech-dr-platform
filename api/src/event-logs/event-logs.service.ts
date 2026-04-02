@@ -16,7 +16,11 @@ export class EventLogsService implements OnModuleInit {
   ) {}
 
   // This lifecycle hook fires automatically when the app starts
-  onModuleInit() {
+  async onModuleInit() {
+    this.logger.log('Waiting 15 seconds for LocalStack to initialize...');
+    // This delay prevents the "QueueDoesNotExist" or "Connection Refused" errors
+    await new Promise(resolve => setTimeout(resolve, 20000)); 
+    
     this.logger.log('Starting SQS Consumer for Event Logs...');
     this.pollQueue();
   }
