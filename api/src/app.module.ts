@@ -5,6 +5,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { TransactionsModule } from './transactions/transactions.module';
 import { EventLogsModule } from './event-logs/event-logs.module';
 import { AwsModule } from './aws/aws.module';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 
 @Module({
   imports: [
@@ -43,7 +45,7 @@ import { AwsModule } from './aws/aws.module';
 
     AwsModule,
   ],
-  controllers: [],
-  providers: [],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}
