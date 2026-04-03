@@ -7,6 +7,7 @@ import { EventLogsModule } from './event-logs/event-logs.module';
 import { AwsModule } from './aws/aws.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 
 @Module({
   imports: [
@@ -38,6 +39,8 @@ import { AppService } from './app.service';
         uri: configService.get<string>('MONGO_URI'),
       }),
     }),
+
+    PrometheusModule.register(),
 
     TransactionsModule,
 

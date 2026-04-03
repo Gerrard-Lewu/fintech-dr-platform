@@ -4,6 +4,7 @@ import { TransactionsService } from './transactions.service';
 import { TransactionsController } from './transactions.controller';
 import { Transaction } from './entities/transaction.entity';
 import { AwsModule } from '../aws/aws.module';
+import { makeCounterProvider } from '@willsoto/nestjs-prometheus';
 
 @Module({
   // Import the TypeORM feature to recognize the Transaction entity
@@ -12,6 +13,12 @@ import { AwsModule } from '../aws/aws.module';
     AwsModule // Add to the imports array
   ],
   controllers: [TransactionsController],
-  providers: [TransactionsService],
+  providers: [
+    TransactionsService,
+    makeCounterProvider({
+      name: 'fintech_transactions_total',
+      help: 'Total number of transactions processed by the API',
+    }),
+  ],
 })
 export class TransactionsModule {}
