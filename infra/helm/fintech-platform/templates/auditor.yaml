@@ -19,7 +19,18 @@ spec:
         ports:
         - name: metrics
           containerPort: 5000
-        # ----------------------------
+        livenessProbe:
+          httpGet:
+            path: /metrics
+            port: 5000
+          initialDelaySeconds: 20
+          periodSeconds: 20
+        readinessProbe:
+          httpGet:
+            path: /metrics
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 10
         env:
         - name: PG_CONN
           value: "Host=postgres;Username={{ .Values.database.user }};Password={{ .Values.database.pass }};Database={{ .Values.database.ledgerName }}"

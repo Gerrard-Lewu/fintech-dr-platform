@@ -15,9 +15,21 @@ spec:
       containers:
       - name: api
         image: {{ .Values.images.api }}
-        imagePullPolicy: Never # Tells K8s to use the local image you built
+        imagePullPolicy: Never
         ports:
         - containerPort: 3000
+        livenessProbe:
+          httpGet:
+            path: /metrics
+            port: 3000
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        readinessProbe:
+          httpGet:
+            path: /metrics
+            port: 3000
+          initialDelaySeconds:
+          periodSeconds: 10
         env:
         - name: POSTGRES_URI
           value: "postgresql://{{ .Values.database.user }}:Strangerthings06@postgres:5432/{{ .Values.database.ledgerName }}"
@@ -41,7 +53,7 @@ metadata:
   labels:
     app: api
 spec:
-  type: LoadBalancer # This makes the API accessible from Windows browser at localhost:3000
+  type: LoadBalancer
   selector:
     app: api
   ports:
