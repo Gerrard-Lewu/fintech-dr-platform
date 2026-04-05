@@ -1,5 +1,6 @@
 using MongoDB.Driver;
 using Npgsql;
+using Prometheus; // 1. IMPORT PROMETHEUS
 
 namespace ReconciliationService;
 
@@ -7,8 +8,15 @@ public class Worker : BackgroundService
 {
     private readonly ILogger<Worker> _logger;
     private readonly string _pgConn = Environment.GetEnvironmentVariable("PG_CONN") ?? "Host=localhost;Username=admin;Password=Strangerthings06;Database=ledger_db";
-
     private readonly string _mongoConn = Environment.GetEnvironmentVariable("MONGO_CONN") ?? "mongodb://admin:Strangerthings06@localhost:27017";
+
+    // 2. DEFINE THE GAUGES
+    // These will be the "Line A" and "Line B" on your Grafana chart.
+    private static readonly Gauge PgLedgerGauge = Metrics
+        .CreateGauge("fintech_postgres_ledger_count", "Current records in Postgres Ledger");
+
+    private static readonly Gauge MongoEventGauge = Metrics
+        .CreateGauge("fintech_mongodb_event_count", "Current records in MongoDB Event Log");
 
     public Worker(ILogger<Worker> logger) => _logger = logger;
 
@@ -23,7 +31,11 @@ public class Worker : BackgroundService
                 using var conn = new NpgsqlConnection(_pgConn);
                 await conn.OpenAsync();
                 using var cmd = new NpgsqlCommand("SELECT COUNT(*) FROM transactions", conn);
-                var pgCount = await cmd.ExecuteScalarAsync();
+                var pgCountRaw = await cmd.ExecuteScalarAsync();
+                double pgCount = Convert.ToDouble(pgCountRaw ?? 0);
+
+                // 3. UPDATE THE METRICS
+                PgLedgerGauge.Set(pgCount);
 
                 // Check Mongo Count
                 var client = new MongoClient(_mongoConn);
@@ -31,9 +43,12 @@ public class Worker : BackgroundService
                 var collection = db.GetCollection<dynamic>("eventlogs");
                 var mongoCount = await collection.CountDocumentsAsync(_ => true);
 
+                // 3. UPDATE THE METRICS
+                MongoEventGauge.Set(mongoCount);
+
                 _logger.LogWarning($"[RECO] Postgres: {pgCount} | MongoDB: {mongoCount}");
                 
-                if (pgCount?.ToString() != mongoCount.ToString()) {
+                if (pgCount != mongoCount) {
                     _logger.LogError("!!! DISCREPANCY DETECTED !!! Data is out of sync.");
                 } else {
                     _logger.LogInformation("Check passed. Systems are in sync.");
@@ -42,7 +57,7 @@ public class Worker : BackgroundService
                 _logger.LogError($"Reconciliation failed: {ex.Message}");
             }
 
-            await Task.Delay(10000, stoppingToken); // Wait 10 seconds
+            await Task.Delay(10000, stoppingToken); 
         }
     }
 }
