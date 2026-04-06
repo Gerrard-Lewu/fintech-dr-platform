@@ -1,0 +1,70 @@
+name: Fintech Platform CI
+
+# Trigger the pipeline on pushes or pull requests to the main branch
+on:
+  push:
+    branches: [ "main" ]
+    paths-ignore:
+      - 'README.md'
+  pull_request:
+    branches: [ "main" ]
+    paths-ignore:
+      - 'README.md'
+
+jobs:
+  # Run NestJS Unit Tests
+  test-api:
+    name: Test API (Node.js)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./api
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js 20
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: ./api/package-lock.json
+
+    - name: Install Dependencies
+      run: npm ci
+
+    - name: Run Unit Tests
+      run: npm run test
+
+  # Build and Security Scan the API Docker Image
+  build-and-scan-api:
+    name: Build & Scan API Image
+    needs: test-api
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Build API Docker Image
+      run: docker build -t fintech-api:ci-test ./api
+
+    - name: Run Trivy Vulnerability Scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: 'fintech-api:ci-test'
+        format: 'table'
+        exit-code: '0' # Set to 0 so it shows the report but doesn't fail the build
+        ignore-unfixed: true
+        vuln-type: 'os,library'
+        severity: 'CRITICAL,HIGH'
+
+  # Build the .NET Auditor Docker Image
+  build-auditor:
+    name: Build Auditor Image (.NET)
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Build Auditor Docker Image
+      run: docker build -t fintech-auditor:ci-test ./services/ReconciliationService
