@@ -1,20 +1,49 @@
-# .NET build artifacts
-**/bin/
-**/obj/
+# ========================
+# Secrets & Environments
+# ========================
+.env
+.env.*
+*.pem
+*.key
 
-# Node.js artifacts
-node_modules/
-dist/
-
-# Python artifacts
-venv/
-__pycache__/
-*.pyc
-
-# Local Database Data (Ignore these!)
+# ========================
+# Local Database Volumes
+# ========================
 infra/local/postgres_data/
 infra/local/mongodb_data/
 infra/local/localstack_data/
 
-# Environment secrets
-.env
+# ========================
+# Node.js (NestJS API)
+# ========================
+node_modules/
+dist/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ========================
+# .NET (Auditor Worker)
+# ========================
+**/bin/
+**/obj/
+.vs/
+*.user
+
+# ========================
+# Python (Load Generator)
+# ========================
+venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+
+# ========================
+# OS & IDE Files
+# ========================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log
