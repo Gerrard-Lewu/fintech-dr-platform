@@ -1,5 +1,7 @@
 # Fintech Disaster Recovery & Observability Platform
 
+[![Fintech Platform CI](https://github.com/Gerrard-Lewu/fintech-dr-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/Gerrard-Lewu/fintech-dr-platform/actions/workflows/ci.yml)
+
 A cloud-native, distributed microservices platform designed to demonstrate modern DevOps practices, including distributed transaction reconciliation, automated disaster detection, and Kubernetes self-healing.
 
 ## Architecture Overview
