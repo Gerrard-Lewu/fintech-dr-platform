@@ -16,6 +16,10 @@ spec:
       - name: auditor
         image: {{ .Values.images.auditor }}
         imagePullPolicy: Never
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1000
+          allowPrivilegeEscalation: false
         ports:
         - name: metrics
           containerPort: 5000

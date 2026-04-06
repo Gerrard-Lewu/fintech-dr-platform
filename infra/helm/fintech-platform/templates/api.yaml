@@ -16,6 +16,10 @@ spec:
       - name: api
         image: {{ .Values.images.api }}
         imagePullPolicy: Never
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1000
+          allowPrivilegeEscalation: false
         ports:
         - containerPort: 3000
         livenessProbe:
