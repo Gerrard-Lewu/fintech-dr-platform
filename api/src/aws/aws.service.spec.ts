@@ -1,12 +1,20 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AwsService } from './aws.service';
+import { ConfigService } from '@nestjs/config';
 
 describe('AwsService', () => {
   let service: AwsService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [AwsService],
+      providers: [
+        AwsService,
+        // Mock the ConfigService so it doesn't look for the .env file
+        { 
+          provide: ConfigService, 
+          useValue: { get: jest.fn().mockReturnValue('mock-value') } 
+        },
+      ],
     }).compile();
 
     service = module.get<AwsService>(AwsService);
