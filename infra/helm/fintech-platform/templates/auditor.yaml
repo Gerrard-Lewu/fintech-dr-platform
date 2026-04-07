@@ -12,10 +12,12 @@ spec:
       labels:
         app: auditor
     spec:
+      imagePullSecrets:
+        - name: ecr-secret
       containers:
       - name: auditor
         image: {{ .Values.images.auditor }}
-        imagePullPolicy: Never
+        imagePullPolicy: Always
         securityContext:
           runAsNonRoot: true
           runAsUser: 1000
