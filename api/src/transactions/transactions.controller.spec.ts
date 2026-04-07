@@ -10,7 +10,14 @@ describe('TransactionsController', () => {
       controllers: [TransactionsController],
       providers: [
         // Mock the Service
-        { provide: TransactionsService, useValue: {} },
+        {
+          provide: TransactionsService,
+          useValue: {
+            create: jest.fn(),
+            findAll: jest.fn(),
+            findOne: jest.fn(),
+          },
+        },
       ],
     }).compile();
 

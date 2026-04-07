@@ -5,12 +5,14 @@ import { TransactionsController } from './transactions.controller';
 import { Transaction } from './entities/transaction.entity';
 import { AwsModule } from '../aws/aws.module';
 import { makeCounterProvider } from '@willsoto/nestjs-prometheus';
+import { AzureModule } from '../azure/azure.module';
 
 @Module({
   // Import the TypeORM feature to recognize the Transaction entity
   imports: [
     TypeOrmModule.forFeature([Transaction]), 
-    AwsModule // Add to the imports array
+    AwsModule,
+    AzureModule // Add to the imports array
   ],
   controllers: [TransactionsController],
   providers: [

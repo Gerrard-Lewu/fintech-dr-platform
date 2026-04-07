@@ -57,6 +57,11 @@ spec:
             secretKeyRef:
               name: aws-credentials
               key: AWS_SECRET_ACCESS_KEY
+        - name: AZURE_SERVICEBUS_CONNECTION_STRING
+          valueFrom:
+            secretKeyRef:
+              name: azure-credentials
+              key: AZURE_SERVICEBUS_CONNECTION_STRING
 ---
 apiVersion: v1
 kind: Service
