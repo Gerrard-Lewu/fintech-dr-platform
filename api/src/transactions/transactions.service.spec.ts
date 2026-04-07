@@ -3,6 +3,7 @@ import { TransactionsService } from './transactions.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Transaction } from './entities/transaction.entity';
 import { AwsService } from '../aws/aws.service';
+import { AzureService } from '../azure/azure.service';
 import { getToken } from '@willsoto/nestjs-prometheus';
 
 describe('TransactionsService', () => {
@@ -16,6 +17,8 @@ describe('TransactionsService', () => {
         { provide: getRepositoryToken(Transaction), useValue: {} },
         // Mock the AWS Service
         { provide: AwsService, useValue: {} },
+        // --- 2. Add the AzureService Mock ---
+        { provide: AzureService, useValue: { sendTransactionMessage: jest.fn() } },
         // Mock the Prometheus Counter
         { provide: getToken('fintech_transactions_total'), useValue: { inc: jest.fn() } },
       ],
