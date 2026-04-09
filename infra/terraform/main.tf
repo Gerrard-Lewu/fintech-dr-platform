@@ -1,4 +1,4 @@
-# 1. ECR Repository for the NestJS API
+# ECR Repository for the NestJS API
 resource "aws_ecr_repository" "fintech_api" {
   name                 = "fintech-dr-api"
   image_tag_mutability = "MUTABLE"
@@ -8,7 +8,7 @@ resource "aws_ecr_repository" "fintech_api" {
   }
 }
 
-# 2. ECR Repository for the .NET Auditor
+# ECR Repository for the .NET Auditor
 resource "aws_ecr_repository" "fintech_auditor" {
   name                 = "fintech-dr-auditor"
   image_tag_mutability = "MUTABLE"
@@ -18,7 +18,7 @@ resource "aws_ecr_repository" "fintech_auditor" {
   }
 }
 
-# 3. The Production SQS Queue
+# The Production SQS Queue
 resource "aws_sqs_queue" "transaction_queue" {
   name                      = "production-transaction-queue"
   delay_seconds             = 0
@@ -30,7 +30,7 @@ resource "aws_sqs_queue" "transaction_queue" {
   sqs_managed_sse_enabled = true
 }
 
-# 4. Output the created resource URLs so we can use them later
+# Output the created resource URLs
 output "api_ecr_url" {
   value = aws_ecr_repository.fintech_api.repository_url
 }

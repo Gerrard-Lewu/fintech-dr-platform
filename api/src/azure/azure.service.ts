@@ -21,7 +21,7 @@ export class AzureService {
       throw new Error('Azure Service Bus Client not initialized.');
     }
     
-    // Create a sender for the queue we defined in Terraform
+    // Create a sender for the queue defined in Terraform
     const sender = this.sbClient.createSender('failover-transaction-queue');
     
     try {
@@ -29,7 +29,6 @@ export class AzureService {
         body: payload,
       });
     } finally {
-      // Always close the sender to prevent memory leaks
       await sender.close();
     }
   }

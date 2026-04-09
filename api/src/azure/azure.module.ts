@@ -3,6 +3,6 @@ import { AzureService } from './azure.service';
 
 @Module({
   providers: [AzureService],
-  exports: [AzureService], // We export it so other modules can use it
+  exports: [AzureService],
 })
 export class AzureModule {}

@@ -1,6 +1,6 @@
 using MongoDB.Driver;
 using Npgsql;
-using Prometheus; // 1. IMPORT PROMETHEUS
+using Prometheus;
 
 namespace ReconciliationService;
 
@@ -10,8 +10,6 @@ public class Worker : BackgroundService
     private readonly string _pgConn = Environment.GetEnvironmentVariable("PG_CONN") ?? "Host=localhost;Username=admin;Password=Strangerthings06;Database=ledger_db";
     private readonly string _mongoConn = Environment.GetEnvironmentVariable("MONGO_CONN") ?? "mongodb://admin:Strangerthings06@localhost:27017";
 
-    // 2. DEFINE THE GAUGES
-    // These will be the "Line A" and "Line B" on your Grafana chart.
     private static readonly Gauge PgLedgerGauge = Metrics
         .CreateGauge("fintech_postgres_ledger_count", "Current records in Postgres Ledger");
 
@@ -34,7 +32,7 @@ public class Worker : BackgroundService
                 var pgCountRaw = await cmd.ExecuteScalarAsync();
                 double pgCount = Convert.ToDouble(pgCountRaw ?? 0);
 
-                // 3. UPDATE THE METRICS
+                // UPDATE THE METRICS
                 PgLedgerGauge.Set(pgCount);
 
                 // Check Mongo Count
@@ -43,7 +41,7 @@ public class Worker : BackgroundService
                 var collection = db.GetCollection<dynamic>("eventlogs");
                 var mongoCount = await collection.CountDocumentsAsync(_ => true);
 
-                // 3. UPDATE THE METRICS
+                // UPDATE THE METRICS
                 MongoEventGauge.Set(mongoCount);
 
                 _logger.LogWarning($"[RECO] Postgres: {pgCount} | MongoDB: {mongoCount}");
