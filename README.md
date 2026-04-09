@@ -1,4 +1,4 @@
-# 🌩️ Enterprise Fintech Disaster Recovery & Observability Platform
+# Enterprise Fintech Disaster Recovery & Observability Platform
 
 > A highly resilient, event-driven microservices architecture featuring an active-passive multi-cloud failover (AWS to Azure) with real-time observability and infrastructure as code.
 
@@ -20,7 +20,7 @@
 
 ---
 
-## 🎯 The Problem & The Solution
+## The Problem & The Solution
 
 **The Problem:** Financial institutions require 99.999% uptime and zero data loss. Relying on a single cloud provider creates a massive single point of failure (SPOF). Furthermore, tightly coupled monolithic databases make it difficult to scale high-throughput transaction processing while maintaining a secure, immutable audit trail.
 
@@ -32,10 +32,10 @@
 
 ---
 
-## 🏗️ Architecture Flow
+## Architecture Flow
 
-![Architecture Diagram](PLACEHOLDER_ARCHITECTURE_DIAGRAM.png)
-*(Placeholder: System architecture diagram showing K8s, AWS, Azure, and the database flows).*
+![Architecture Diagram](assets/architecture.gif)
+*System architecture diagram showing K8s, AWS, Azure, and the database flows*
 
 1. Client sends transaction burst via the Load Generator.
 2. NestJS API receives, throttles (if necessary), and commits to **Postgres**.
@@ -46,7 +46,7 @@
 
 ---
 
-## 🛠️ Technologies Used
+## Technologies Used
 
 **Cloud & Infrastructure:**
 * **AWS:** Elastic Container Registry (ECR), Simple Queue Service (SQS)
@@ -66,7 +66,7 @@
 
 ---
 
-## ⚙️ Key Features & System Tests
+## Key Features & System Tests
 
 ### 1. Multi-Cloud Active-Passive Failover (Disaster Recovery)
 The core feature of this platform. To test the DR capabilities, I intentionally sabotage the AWS routing configuration inside Kubernetes to simulate a total regional outage. The application catches the failure in real-time and reroutes traffic to Azure.
@@ -76,23 +76,23 @@ kubectl set env deployment/fintech-api AWS_SQS_QUEUE_URL="[https://sqs.us-east-1
 ```
 
 ![Failover GIF](assets/failover.gif)
-*(GIF showing the terminal logs failing on AWS and successfully routing to Azure).*
+*GIF showing the terminal logs failing on AWS and successfully routing to Azure*
 
 ### 2. API Rate Limiting & Throttling
 To protect the backend from DDoS attacks or runaway client scripts, the API utilizes a strict Throttler logic. Bursting 10+ requests in a second results in an HTTP 429 response.
 
 ![Rate Limiting GIF](assets/rate-limit.gif)
-*(GIF of the Python load generator hitting the 429 Too Many Requests wall).*
+*GIF of the Python load generator hitting the 429 Too Many Requests wall*
 
 ### 3. Real-Time Observability
 The platform features native Prometheus metrics exported to a Grafana dashboard, tracking transaction throughput, database query times, and pod health.
 
 ![Grafana Dashboard](assets/grafana.png)
-*(GIF of the beautiful Grafana charts).*
+*GIF of the beautiful Grafana charts*
 
 ---
 
-## 🧠 Challenges & Engineering Solutions
+## Challenges & Engineering Solutions
 
 Building a distributed, multi-cloud system locally presented several complex DevOps challenges:
 
@@ -110,7 +110,7 @@ Building a distributed, multi-cloud system locally presented several complex Dev
 
 ---
 
-## 🚀 Local Installation & Setup
+## Local Installation & Setup
 
 This project requires active AWS and Microsoft Azure accounts to provision the multi-cloud message brokers. 
 
@@ -176,7 +176,7 @@ kubectl port-forward svc/grafana 8080:80
 ```
 
 ---
-## 🧹 Tear Down
+## Tear Down
 To avoid incurring unnecessary cloud charges from AWS and Azure, ensure you destroy the infrastructure once you are finished evaluating the platform:
 
 ```bash
@@ -189,7 +189,7 @@ terraform destroy -auto-approve
 ```
 
 ---
-## 🤝 Contributing
+## Contributing
 This is a personal portfolio project intended to demonstrate Cloud Engineering and DevOps methodologies. However, feel free to fork the repository, deploy it to your own cloud environments, and play around with the multi-cloud configurations!
 
 ## 📫 Contact
