@@ -34,10 +34,10 @@ export class EventLogsService implements OnModuleInit {
         for (const message of messages) {
           this.logger.log(`Processing SQS message: ${message.MessageId}`);
 
-          // 1. Parse the JSON payload we sent from the Transactions Service
+          // Parse the JSON payload from the Transactions Service
           const payload = JSON.parse(message.Body!);
 
-          // 2. Save it directly to MongoDB as an immutable audit log
+          // Save directly to MongoDB as an immutable audit log
           const newLog = new this.eventLogModel({
             transactionId: payload.data.id,
             eventType: payload.eventType,
@@ -47,14 +47,12 @@ export class EventLogsService implements OnModuleInit {
           await newLog.save();
           this.logger.log(`Saved EventLog to MongoDB for transaction: ${payload.data.id}`);
 
-          // 3. Delete the message from SQS so it isn't processed twice
+          // Delete the message from SQS so it isn't processed twice
           await this.awsService.deleteMessage(message.ReceiptHandle!);
           this.logger.log(`Deleted message ${message.MessageId} from queue`);
         }
       } catch (error) {
         this.logger.error('Error polling SQS queue', error);
-        // If something completely breaks, wait 5 seconds before trying again 
-        // to prevent an aggressive infinite error loop
         await new Promise(resolve => setTimeout(resolve, 5000));
       }
     }

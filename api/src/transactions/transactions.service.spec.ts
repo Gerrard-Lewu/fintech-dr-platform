@@ -17,7 +17,7 @@ describe('TransactionsService', () => {
         { provide: getRepositoryToken(Transaction), useValue: {} },
         // Mock the AWS Service
         { provide: AwsService, useValue: {} },
-        // --- 2. Add the AzureService Mock ---
+        // Add the AzureService Mock
         { provide: AzureService, useValue: { sendTransactionMessage: jest.fn() } },
         // Mock the Prometheus Counter
         { provide: getToken('fintech_transactions_total'), useValue: { inc: jest.fn() } },
