@@ -76,19 +76,19 @@ kubectl set env deployment/fintech-api AWS_SQS_QUEUE_URL="[https://sqs.us-east-1
 ```
 
 ![Failover GIF](assets/failover.gif)
-*(Placeholder: GIF showing the terminal logs failing on AWS and successfully routing to Azure).*
+*(GIF showing the terminal logs failing on AWS and successfully routing to Azure).*
 
 ### 2. API Rate Limiting & Throttling
 To protect the backend from DDoS attacks or runaway client scripts, the API utilizes a strict Throttler logic. Bursting 10+ requests in a second results in an HTTP 429 response.
 
 ![Rate Limiting GIF](assets/rate-limit.gif)
-*(Placeholder: Screenshot of the Python load generator hitting the 429 Too Many Requests wall).*
+*(GIF of the Python load generator hitting the 429 Too Many Requests wall).*
 
 ### 3. Real-Time Observability
 The platform features native Prometheus metrics exported to a Grafana dashboard, tracking transaction throughput, database query times, and pod health.
 
 ![Grafana Dashboard](assets/grafana.png)
-*(Placeholder: Screenshot of the beautiful Grafana charts).*
+*(GIF of the beautiful Grafana charts).*
 
 ---
 
